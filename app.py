@@ -4,11 +4,11 @@ app = Flask(__name__)
 
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDU B IT — DevOps-портфолио</title>
+    <title>IDU B IT — From AnyKey to DevOps</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,6 @@ HTML_TEMPLATE = '''
             overflow: hidden;
         }
 
-        /* Основной фон */
         .background {
             position: fixed;
             top: 0;
@@ -37,7 +36,6 @@ HTML_TEMPLATE = '''
             z-index: -2;
         }
 
-        /* Плавающие круги (как раньше) */
         .orb-1, .orb-2, .orb-3 {
             position: fixed;
             border-radius: 50%;
@@ -78,9 +76,8 @@ HTML_TEMPLATE = '''
             100% { transform: translate(0, 0) scale(1); }
         }
 
-        /* ===== НОВЫЕ АНИМАЦИИ ПО БОКАМ ===== */
+        /* ===== АНИМАЦИИ ПО БОКАМ ===== */
 
-        /* Левая колонка — падающие звёзды */
         .stars-left {
             position: fixed;
             left: 20px;
@@ -116,7 +113,6 @@ HTML_TEMPLATE = '''
             100% { top: 110%; opacity: 0; transform: scale(0.8); }
         }
 
-        /* Правая колонка — движущиеся линии / волны */
         .waves-right {
             position: fixed;
             right: 10px;
@@ -146,7 +142,6 @@ HTML_TEMPLATE = '''
             100% { transform: translateY(100%) scaleY(0.5); opacity: 0; }
         }
 
-        /* Правый нижний угол — крутящийся куб */
         .cube-container {
             position: fixed;
             bottom: 30px;
@@ -189,7 +184,6 @@ HTML_TEMPLATE = '''
             100% { transform: rotateX(360deg) rotateY(360deg); }
         }
 
-        /* Левый нижний угол — пульсирующий круг с буквами */
         .pulse-ring {
             position: fixed;
             bottom: 30px;
@@ -224,7 +218,8 @@ HTML_TEMPLATE = '''
             100% { transform: scale(1); opacity: 0.3; }
         }
 
-        /* Центральная карточка (остаётся как есть) */
+        /* ===== ЦЕНТРАЛЬНАЯ КАРТОЧКА ===== */
+
         .card {
             background: rgba(20, 20, 35, 0.7);
             backdrop-filter: blur(20px);
@@ -277,48 +272,128 @@ HTML_TEMPLATE = '''
             width: 60px;
             height: 2px;
             background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
-            margin: 16px auto 24px;
+            margin: 16px auto 20px;
         }
 
-        .description {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 18px;
-            line-height: 1.7;
-            margin-bottom: 32px;
-        }
-        .description strong {
-            color: rgba(255, 255, 255, 0.85);
+        /* ===== ИНТЕРАКТИВНЫЙ ПУТЬ ===== */
+
+        .path-section {
+            margin: 12px 0 16px;
+            padding: 20px 12px 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
         }
 
-        .tech-grid {
+        .path-track {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 0;
+            width: 100%;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 32px;
+            padding-top: 4px;
         }
-        .tech-tag {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
+
+        .path-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .path-point .point-icon {
+            font-size: 28px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.06);
             transition: all 0.3s ease;
         }
-        .tech-tag:hover {
-            background: rgba(168, 85, 247, 0.1);
-            border-color: rgba(168, 85, 247, 0.2);
-            color: #a855f7;
-            transform: translateY(-2px);
+
+        .path-point .point-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-align: center;
+            white-space: nowrap;
         }
+
+        .path-point.start .point-icon {
+            border-color: rgba(168,85,247,0.2);
+            background: rgba(168,85,247,0.05);
+        }
+        .path-point.start .point-label {
+            color: rgba(168,85,247,0.4);
+        }
+
+        .path-point.end .point-icon {
+            border-color: rgba(0,200,255,0.2);
+            background: rgba(0,200,255,0.05);
+            animation: glowPulse 2s infinite ease-in-out;
+        }
+        .path-point.end .point-label {
+            color: rgba(0,200,255,0.5);
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0,200,255,0.05); }
+            50% { box-shadow: 0 0 40px rgba(0,200,255,0.15); }
+        }
+
+        .path-line {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            position: relative;
+            margin: 0 4px;
+            min-width: 40px;
+            max-width: 120px;
+        }
+
+        .path-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #06b6d4);
+            border-radius: 4px;
+            position: relative;
+            transition: width 1.5s ease;
+        }
+
+        /* ===== РАКЕТА ===== */
+        .path-walker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            animation: rocketFly 1.2s infinite ease-in-out;
+            filter: drop-shadow(0 0 30px rgba(255, 100, 0, 0.3));
+        }
+
+        @keyframes rocketFly {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(-4deg); 
+            }
+            50% { 
+                transform: translate(-50%, -75%) scale(1.1) rotate(4deg); 
+            }
+        }
+
+        /* ===== КНОПКИ ===== */
 
         .buttons {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 12px;
+            margin-top: 4px;
         }
         .btn {
             padding: 12px 32px;
@@ -354,8 +429,8 @@ HTML_TEMPLATE = '''
         }
 
         .status {
-            margin-top: 28px;
-            color: rgba(255, 255, 255, 0.15);
+            margin-top: 24px;
+            color: rgba(255, 255, 255, 0.12);
             font-size: 12px;
             letter-spacing: 1px;
         }
@@ -373,22 +448,46 @@ HTML_TEMPLATE = '''
             50% { opacity: 0.3; }
         }
 
+        /* ===== АДАПТИВ ===== */
+
         @media (max-width: 600px) {
-            .card { padding: 40px 24px; border-radius: 24px; }
-            h1 { font-size: 30px; }
-            .logo { font-size: 48px; }
-            .description { font-size: 16px; }
-            .btn { padding: 10px 24px; font-size: 14px; }
+            .card { padding: 32px 20px; border-radius: 24px; }
+            h1 { font-size: 28px; }
+            .logo { font-size: 44px; }
+            .subtitle { font-size: 14px; }
+            .btn { padding: 10px 20px; font-size: 13px; }
             .stars-left, .waves-right { display: none; }
-            .cube-container { width: 50px; height: 50px; bottom: 15px; right: 15px; }
-            .cube-face { width: 50px; height: 50px; font-size: 16px; }
-            .pulse-ring { width: 50px; height: 50px; font-size: 14px; bottom: 15px; left: 15px; }
-            .cube-face.front  { transform: translateZ(25px); }
-            .cube-face.back   { transform: rotateY(180deg) translateZ(25px); }
-            .cube-face.right  { transform: rotateY(90deg) translateZ(25px); }
-            .cube-face.left   { transform: rotateY(-90deg) translateZ(25px); }
-            .cube-face.top    { transform: rotateX(90deg) translateZ(25px); }
-            .cube-face.bottom { transform: rotateX(-90deg) translateZ(25px); }
+            .cube-container { width: 44px; height: 44px; bottom: 12px; right: 12px; }
+            .cube-face { width: 44px; height: 44px; font-size: 14px; }
+            .pulse-ring { width: 50px; height: 50px; font-size: 14px; bottom: 12px; left: 12px; }
+            .cube-face.front  { transform: translateZ(22px); }
+            .cube-face.back   { transform: rotateY(180deg) translateZ(22px); }
+            .cube-face.right  { transform: rotateY(90deg) translateZ(22px); }
+            .cube-face.left   { transform: rotateY(-90deg) translateZ(22px); }
+            .cube-face.top    { transform: rotateX(90deg) translateZ(22px); }
+            .cube-face.bottom { transform: rotateX(-90deg) translateZ(22px); }
+            .path-point .point-icon {
+                font-size: 20px;
+                width: 38px;
+                height: 38px;
+            }
+            .path-point .point-label {
+                font-size: 10px;
+            }
+            .path-line {
+                min-width: 20px;
+                max-width: 60px;
+            }
+            .path-walker {
+                font-size: 24px;
+            }
+            .path-section {
+                padding: 12px 6px 8px;
+                margin: 8px 0 12px;
+            }
+            .divider {
+                margin: 12px auto 16px;
+            }
         }
     </style>
 </head>
@@ -433,32 +532,41 @@ HTML_TEMPLATE = '''
     <!-- ЛЕВЫЙ НИЗ: пульсирующее кольцо -->
     <div class="pulse-ring">⚡</div>
 
-    <!-- Центральная карточка -->
+    <!-- ЦЕНТРАЛЬНАЯ КАРТОЧКА -->
     <div class="card">
         <div class="logo">🚀</div>
         <h1>IDU B IT</h1>
-        <div class="subtitle">DevOps · Python · C++</div>
+        <div class="subtitle">From AnyKey to DevOps</div>
         <div class="divider"></div>
-        <p class="description">
-            <strong>Мой первый DevOps-проект</strong><br>
-            Веб-приложение на <strong>Flask</strong>, запущенное в <strong>Docker</strong>.<br>
-            Стенд на <strong>Ubuntu Server</strong> + VMware.
-        </p>
-        <div class="tech-grid">
-            <span class="tech-tag">🐍 Python</span>
-            <span class="tech-tag">🌶️ Flask</span>
-            <span class="tech-tag">🐳 Docker</span>
-            <span class="tech-tag">🐧 Ubuntu</span>
-            <span class="tech-tag">🔷 Git</span>
-            <span class="tech-tag">☁️ VMware</span>
+
+        <!-- ИНТЕРАКТИВНЫЙ ПУТЬ -->
+        <div class="path-section">
+            <div class="path-track">
+                <div class="path-point start">
+                    <span class="point-icon">🖥️</span>
+                    <span class="point-label">AnyKey</span>
+                </div>
+                <div class="path-line">
+                    <div class="path-progress" style="width: 50%;"></div>
+                    <div class="path-walker">🚀</div>
+                </div>
+                <div class="path-point end">
+                    <span class="point-icon">☁️</span>
+                    <span class="point-label">DevOps</span>
+                </div>
+            </div>
         </div>
+
+        <div class="divider"></div>
+
         <div class="buttons">
-            <a href="https://github.com/degex26/idu_B_IT" target="_blank" class="btn btn-primary">📂 GitHub</a>
-            <a href="#" class="btn btn-secondary">📬 Связаться</a>
+            <a href="https://github.com/degex26?tab=repositories" target="_blank" class="btn btn-primary">🚀 My Project</a>
+            <a href="#" class="btn btn-secondary">📬 Contact</a>
         </div>
+
         <div class="status">
             <span class="status-dot"></span>
-            Статус: Работает 🟢
+            Status: On the way 🚀
         </div>
     </div>
 </body>
