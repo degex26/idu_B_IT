@@ -1,4 +1,4 @@
-# 🖥️ IDU B IT — DevOps-стенд
+# 🖥️ IDU B IT — стенд
 
 > **Мой первый DevOps-проект:** веб-приложение на Python + Flask, запущенное в Docker на домашнем сервере (VMware + Ubuntu).
 
