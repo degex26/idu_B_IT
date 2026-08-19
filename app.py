@@ -1,6 +1,12 @@
 from flask import Flask, render_template_string
+import datetime
+import os
 
 app = Flask(__name__)
+
+# Получаем информацию о деплое
+DEPLOY_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+COMMIT_HASH = os.popen('git rev-parse --short HEAD').read().strip() or "unknown"
 
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
@@ -386,6 +392,25 @@ HTML_TEMPLATE = '''
             }
         }
 
+        /* ===== ИНДИКАТОР ДЕПЛОЯ ===== */
+        .deploy-info {
+            margin-top: 16px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding-top: 16px;
+        }
+
+        .deploy-info .version {
+            color: rgba(255,255,255,0.25);
+            font-weight: 600;
+        }
+
+        .deploy-info .time {
+            color: rgba(255,255,255,0.15);
+        }
+
         /* ===== КНОПКИ ===== */
 
         .buttons {
@@ -488,6 +513,9 @@ HTML_TEMPLATE = '''
             .divider {
                 margin: 12px auto 16px;
             }
+            .deploy-info {
+                font-size: 9px;
+            }
         }
     </style>
 </head>
@@ -568,6 +596,12 @@ HTML_TEMPLATE = '''
             <span class="status-dot"></span>
             Status: On the way 🚀
         </div>
+
+        <!-- ===== ИНДИКАТОР ДЕПЛОЯ ===== -->
+        <div class="deploy-info">
+            <span class="version">v{{ commit }}</span> · 
+            <span class="time">deployed at {{ time }}</span>
+        </div>
     </div>
 </body>
 </html>
@@ -575,7 +609,11 @@ HTML_TEMPLATE = '''
 
 @app.route('/')
 def home():
-    return render_template_string(HTML_TEMPLATE)
+    return render_template_string(
+        HTML_TEMPLATE,
+        commit=COMMIT_HASH,
+        time=DEPLOY_TIME
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
