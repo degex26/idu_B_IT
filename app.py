@@ -6,6 +6,9 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import bcrypt
 
+COMMIT_HASH = "v1.0.0"
+DEPLOY_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
