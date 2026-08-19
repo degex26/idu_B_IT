@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Получаем информацию о деплое
 DEPLOY_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-COMMIT_HASH = os.popen('git rev-parse --short HEAD').read().strip() or "unknown"
+COMMIT_HASH = "локальная-версия"
 
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
