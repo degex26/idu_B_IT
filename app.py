@@ -1,6 +1,40 @@
 from flask import Flask, render_template_string
 import datetime
 import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+# Подключение к БД на Ubuntu (контейнер postgres-db)
+def get_db_connection():
+    return psycopg2.connect(
+        host="localhost",      # БД на той же Ubuntu
+        port=5432,
+        database="projects",
+        user="devops",
+        password="devops123"
+    )
+
+def init_db():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS projects (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                description TEXT,
+                tech VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("✅ Таблица projects готова")
+    except Exception as e:
+        print(f"❌ Ошибка БД: {e}")
+
+init_db()
 
 app = Flask(__name__)
 
@@ -1005,6 +1039,41 @@ def about():
         commit=COMMIT_HASH,
         time=DEPLOY_TIME
     )
+@app.route('/projects')
+def projects():
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('SELECT * FROM projects ORDER BY created_at DESC')
+    items = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    html = '''
+    <!DOCTYPE html>
+    <html>
+    <head><title>Мои проекты</title></head>
+    <body style="background:#0a0a0f;color:white;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;">
+        <div style="background:rgba(20,20,35,0.8);padding:40px;border-radius:24px;max-width:600px;width:90%;">
+            <h1 style="color:#10b981;">📁 Мои проекты</h1>
+            <ul style="list-style:none;padding:0;">
+    '''
+    for p in items:
+        html += f'<li style="background:rgba(255,255,255,0.03);padding:16px;border-radius:12px;margin:10px 0;">'
+        html += f'<strong style="color:#fff;">{p["name"]}</strong>'
+        if p["description"]:
+            html += f'<p style="color:#aaa;font-size:14px;margin:6px 0;">{p["description"]}</p>'
+        if p["tech"]:
+            html += f'<span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 12px;border-radius:50px;font-size:12px;">{p["tech"]}</span>'
+        html += '</li>'
+    
+    html += '''
+            </ul>
+            <a href="/" style="color:#10b981;text-decoration:none;">← На главную</a>
+        </div>
+    </body>
+    </html>
+    '''
+    return html
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
